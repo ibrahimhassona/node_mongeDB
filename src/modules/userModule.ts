@@ -1,5 +1,5 @@
 import { Document, model, Schema } from "mongoose";
-
+import bcrypt from "bcrypt";
 export interface IUser extends Document {
   name: string;
   email: string;
@@ -14,7 +14,7 @@ export interface IUser extends Document {
   refreshToken: string;
 }
 
-const userScheman = new Schema<IUser>({
+const userSchema = new Schema<IUser>({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true, select: false },
@@ -26,4 +26,4 @@ const userScheman = new Schema<IUser>({
   active: { type: Boolean, default: false },
 });
 
-export const User = model<IUser>("User", userScheman);
+export const User = model<IUser>("User", userSchema);

@@ -7,6 +7,7 @@ import mongoSanitize from "express-mongo-sanitize";
 import connectDB from "./src/db";
 import sanitizeInputMiddleware from "./src/middlewares/sanitizeInput";
 import userRouter from "./src/Routes/usersRoutes";
+import authRouter from "./src/Routes/authRouter";
 import globalErrorHandler from "./src/controllers/errorController";
 import { AppError } from "./src/utils/AppError";
 
@@ -22,8 +23,9 @@ app.use(mongoSanitize());
 app.use(sanitizeInputMiddleware);
 app.use(cors({ credentials: true, origin: true }));
 
-app.use("/users",userRouter)
-  
+app.use("/auth", authRouter);
+app.use("/users", userRouter);
+
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
