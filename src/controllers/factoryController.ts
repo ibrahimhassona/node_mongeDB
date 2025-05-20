@@ -54,14 +54,13 @@ export const factoryController = <T extends Document>(
 
     updateOne: async (req, res, next) => {
       try {
-      const { password } = req.body;
-      console.log("Password====>", password);
-      if (password) {
-        return res.status(400).json({
-          status: "fail",
-          message: "You cannot update password here",
-        });
-      }
+        const { password } = req.body;
+        if (password) {
+          return res.status(400).json({
+            status: "fail",
+            message: "You cannot update password here",
+          });
+        }
         const updated = await Model.findByIdAndUpdate(req.params.id, req.body, {
           new: true,
           runValidators: true,

@@ -7,10 +7,11 @@ import {
   updateUser,
 } from "../controllers/userController";
 import { protect } from "../middlewares/authMiddleware";
+import { isAdmin } from "../middlewares/isAdmin";
 const router = express.Router();
-router.get("/", protect, getAllUsers);
+router.get("/", protect, isAdmin, getAllUsers);
 router.post("/", createUser);
 router.get("/:id", protect, getUser);
 router.delete("/:id", protect, deleteUser);
-router.patch("/:id", protect, updateUser);
+router.patch("/:id", protect, isAdmin, updateUser);
 export default router;

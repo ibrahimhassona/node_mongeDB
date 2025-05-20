@@ -13,22 +13,23 @@ export const login = async (
   next: NextFunction
 ): Promise<any> => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body ;
     if (!email || !password)
       return res
         .status(400)
         .json({ message: "Please provide email and password" });
 
     //   -- Search for the user in the database --
-    const user = (await User.findOne({ email }).select("+password")) as {
+    const user = (await User.findOne({ email }).select("+password role")) as {
       _id: any;
       password: string;
+      role: string;
     };
     // -- check if the password is correct --
     if (!user || !(await bcrypt.compare(password, user.password)))
       return res.status(401).json({ message: "Invalid credentials" });
     // -- create tokens --
-    const accessToken = generateAccessToken(user._id.toString());
+    const accessToken = generateAccessToken(user._id.toString(), user.role);
     const refreshToken = generateRefreshToken(user._id.toString());
 
     // -- Send the refresh token as a cookie --
@@ -57,7 +58,7 @@ export const refreshToken = async (
     // -- Verify the refresh token --
     const decodded: any = jwt.verify(token, process.env.REFRESH_SECRET!);
     // -- Create a new access token --
-    const newAccessToken = generateAccessToken(decodded.userId);
+    const newAccessToken = generateAccessToken(decodded.userId, decodded.role);
     res.json({ accessToken: newAccessToken });
   } catch (error) {
     next(error);
@@ -93,11 +94,11 @@ export const register = async (
       return res.status(400).json({ message: "Email is already in use" });
     }
     // Encrypt the password and create the user
-    const hashedPassword = await bcrypt.hash(password, 12);
+
     const user = await User.create({
       name,
       email,
-      password: hashedPassword,
+      password: password,
     });
     res.status(201).json({
       message: "Account created successfully",
@@ -132,7 +133,7 @@ export const updatePassword = async (
       return res.status(401).json({ message: "Invalid credentials" });
 
     // -- Update the password --
-    user.password = await bcrypt.hash(newPassword, 12);;
+    user.password = newPassword;
     await user.save();
     res.json({ message: "Password updated successfully" });
   } catch (error) {
